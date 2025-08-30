@@ -1,0 +1,20 @@
+{
+  "todos": {
+    "Coordinator": {
+      "1": {
+        "id": "1",
+        "content": "Configurar credenciales de Supabase para la base de datos y autenticación",
+        "details": "Solicitar las credenciales de Supabase del usuario para configurar la base de datos, autenticación y almacenamiento necesarios para la aplicación.",
+        "status": "completed",
+        "priority": "high"
+      },
+      "2": {
+        "id": "2",
+        "content": "Desarrollar la aplicación web completa de reservas educativas",
+        "details": "Crear una aplicación full-stack con:\n- Panel de administración para gestión completa\n- Gestión de clientes (CRUD completo)\n- Gestión de servicios educativos (tutorías virtuales 30-50 min)\n- Gestión de tutores/especialistas con múltiples especialidades\n- Calendario integrado con sistema de reservas\n- Gestión de disponibilidades de tutores\n- Integración con EmailJS para confirmaciones automáticas\n- Diseño moderno y responsive\n- Base de datos con tablas: clientes, tutores, servicios, especialidades, reservas, disponibilidades\n- Solo acceso administrativo (no autoservicio para clientes)\n- SIN sistema de pagos, solo sistema de reservas/booking",
+        "status": "completed",
+        "priority": "high"
+      }
+    }
+  }
+}
