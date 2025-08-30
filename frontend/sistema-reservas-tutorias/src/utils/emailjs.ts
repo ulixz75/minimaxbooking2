@@ -68,7 +68,8 @@ export const sendEmailNotification = async (
               duracion: data.duracion_minutos,
               notas: data.notas || 'Sin notas adicionales',
               estado: data.estado_reserva,
-              tipo_destinatario: 'cliente'
+              is_cliente: true,
+              is_tutor: false
             }
           );
           emailsEnviados++;
@@ -98,7 +99,8 @@ export const sendEmailNotification = async (
               duracion: data.duracion_minutos,
               notas: data.notas || 'Sin notas adicionales',
               estado: data.estado_reserva,
-              tipo_destinatario: 'tutor'
+              is_cliente: false,
+              is_tutor: true
             }
           );
           emailsEnviados++;
@@ -129,7 +131,8 @@ export const sendEmailNotification = async (
               duracion: data.duracion_minutos,
               notas: data.notas || 'Sin notas adicionales',
               estado: data.estado_reserva,
-              tipo_destinatario: 'cliente'
+              is_cliente: true,
+              is_tutor: false
             }
           );
           emailsEnviados++;
@@ -160,7 +163,8 @@ export const sendEmailNotification = async (
               duracion: data.duracion_minutos,
               notas: data.notas || 'Sin notas adicionales',
               estado: data.estado_reserva,
-              tipo_destinatario: 'cliente'
+              is_cliente: true,
+              is_tutor: false
             }
           );
           emailsEnviados++;
@@ -187,7 +191,8 @@ export const sendEmailNotification = async (
               duracion: data.duracion_minutos,
               notas: data.notas || 'Sin notas adicionales',
               estado: data.estado_reserva,
-              tipo_destinatario: 'tutor'
+              is_cliente: false,
+              is_tutor: true
             }
           );
           emailsEnviados++;
