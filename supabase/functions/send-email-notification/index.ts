@@ -77,118 +77,39 @@ Deno.serve(async (req) => {
             estado_reserva: estado_reserva,
         };
 
-        // Determinar destinatarios según el tipo de email
-        let emailsToSend = [];
+        // The logic is simplified to send a single email.
+        // The EmailJS template is responsible for handling To, Cc, and Bcc.
+        const templateParams = {
+            ...baseTemplateParams,
+            is_client: true,
+            is_tutor: false, // The template content is primarily for the client.
+        };
 
-        switch (tipo_email) {
-            case 'confirmacion':
-                // Enviar tanto al cliente como al tutor
-                emailsToSend = [
-                    {
-                        ...baseTemplateParams,
-                        is_client: true,
-                        is_tutor: false,
-                        to_email: cliente_email, // for logging
-                        asunto: `Confirmación de Tutoría - ${servicio_nombre}`
-                    },
-                    {
-                        ...baseTemplateParams,
-                        is_client: false,
-                        is_tutor: true,
-                        to_email: tutor_email, // for logging
-                        asunto: `Nueva Reserva Asignada - ${servicio_nombre}`
-                    }
-                ];
-                break;
-            
-            case 'recordatorio':
-                // Recordatorio 24h antes - solo al cliente
-                emailsToSend = [{
-                    ...baseTemplateParams,
-                    is_client: true,
-                    is_tutor: false,
-                    to_email: cliente_email, // for logging
-                    asunto: `Recordatorio: Tutoría mañana - ${servicio_nombre}`
-                }];
-                break;
-                
-            case 'cancelacion':
-                // Notificar cancelación a ambos
-                emailsToSend = [
-                    {
-                        ...baseTemplateParams,
-                        is_client: true,
-                        is_tutor: false,
-                        to_email: cliente_email, // for logging
-                        asunto: `Cancelación de Tutoría - ${servicio_nombre}`
-                    },
-                    {
-                        ...baseTemplateParams,
-                        is_client: false,
-                        is_tutor: true,
-                        to_email: tutor_email, // for logging
-                        asunto: `Reserva Cancelada - ${servicio_nombre}`
-                    }
-                ];
-                break;
-                
-            default:
-                throw new Error('Tipo de email no válido');
+        const emailJSResponse = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                service_id: emailCredentials.service_id,
+                template_id: emailCredentials.template_id,
+                user_id: emailCredentials.public_key,
+                template_params: templateParams,
+            }),
+        });
+
+        if (!emailJSResponse.ok) {
+            const errorText = await emailJSResponse.text();
+            console.error(`Error sending email via EmailJS: ${errorText}`);
+            throw new Error(`EmailJS error: ${errorText}`);
         }
 
-        // Enviar emails usando EmailJS API
-        const emailResults = [];
-        
-        for (const emailData of emailsToSend) {
-            try {
-                const emailJSResponse = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        service_id: emailCredentials.service_id,
-                        template_id: emailCredentials.template_id,
-                        user_id: emailCredentials.public_key,
-                        template_params: emailData
-                    })
-                });
-
-                if (!emailJSResponse.ok) {
-                    const errorText = await emailJSResponse.text();
-                    console.error(`Error enviando email a ${emailData.to_email}:`, errorText);
-                    emailResults.push({
-                        destinatario: emailData.to_email,
-                        success: false,
-                        error: errorText
-                    });
-                } else {
-                    console.log(`Email enviado exitosamente a ${emailData.to_email}`);
-                    emailResults.push({
-                        destinatario: emailData.to_email,
-                        success: true
-                    });
-                }
-            } catch (error) {
-                console.error(`Error enviando email a ${emailData.to_email}:`, error.message);
-                emailResults.push({
-                    destinatario: emailData.to_email,
-                    success: false,
-                    error: error.message
-                });
-            }
-        }
-
-        const successCount = emailResults.filter(r => r.success).length;
-        const totalCount = emailResults.length;
+        console.log(`Email for type "${tipo_email}" sent successfully.`);
 
         return new Response(JSON.stringify({
             data: {
                 tipo_email,
-                emails_enviados: successCount,
-                total_emails: totalCount,
-                resultados: emailResults,
-                mensaje: `${successCount}/${totalCount} emails enviados correctamente`
+                emails_enviados: 1,
+                total_emails: 1,
+                mensaje: `1/1 email enviado correctamente.`
             }
         }), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' }
