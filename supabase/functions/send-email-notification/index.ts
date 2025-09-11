@@ -62,18 +62,19 @@ Deno.serve(async (req) => {
             minute: '2-digit'
         });
 
+        const fechaHoraFormateada = `${fechaFormateada} a las ${horaFormateada}`;
+
         // Preparar datos para EmailJS según el tipo de email
-        let templateParams = {
-            cliente_nombre,
-            cliente_email,
-            tutor_nombre,
-            tutor_email,
-            servicio_nombre,
-            fecha: fechaFormateada,
-            hora: horaFormateada,
-            duracion: duracion_minutos,
+        const baseTemplateParams = {
+            client_name: cliente_nombre,
+            cliente_email: cliente_email,
+            tutor_name: tutor_nombre,
+            tutor_email: tutor_email,
+            service_name: servicio_nombre,
+            fecha_hora: fechaHoraFormateada,
+            duracion_minutos: duracion_minutos,
             notas: notas || 'Sin notas adicionales',
-            estado: estado_reserva
+            estado_reserva: estado_reserva,
         };
 
         // Determinar destinatarios según el tipo de email
@@ -84,17 +85,17 @@ Deno.serve(async (req) => {
                 // Enviar tanto al cliente como al tutor
                 emailsToSend = [
                     {
-                        ...templateParams,
-                        to_email: cliente_email,
-                        to_name: cliente_nombre,
-                        destinatario: 'cliente',
+                        ...baseTemplateParams,
+                        is_client: true,
+                        is_tutor: false,
+                        to_email: cliente_email, // for logging
                         asunto: `Confirmación de Tutoría - ${servicio_nombre}`
                     },
                     {
-                        ...templateParams,
-                        to_email: tutor_email,
-                        to_name: tutor_nombre,
-                        destinatario: 'tutor',
+                        ...baseTemplateParams,
+                        is_client: false,
+                        is_tutor: true,
+                        to_email: tutor_email, // for logging
                         asunto: `Nueva Reserva Asignada - ${servicio_nombre}`
                     }
                 ];
@@ -103,10 +104,10 @@ Deno.serve(async (req) => {
             case 'recordatorio':
                 // Recordatorio 24h antes - solo al cliente
                 emailsToSend = [{
-                    ...templateParams,
-                    to_email: cliente_email,
-                    to_name: cliente_nombre,
-                    destinatario: 'cliente',
+                    ...baseTemplateParams,
+                    is_client: true,
+                    is_tutor: false,
+                    to_email: cliente_email, // for logging
                     asunto: `Recordatorio: Tutoría mañana - ${servicio_nombre}`
                 }];
                 break;
@@ -115,17 +116,17 @@ Deno.serve(async (req) => {
                 // Notificar cancelación a ambos
                 emailsToSend = [
                     {
-                        ...templateParams,
-                        to_email: cliente_email,
-                        to_name: cliente_nombre,
-                        destinatario: 'cliente',
+                        ...baseTemplateParams,
+                        is_client: true,
+                        is_tutor: false,
+                        to_email: cliente_email, // for logging
                         asunto: `Cancelación de Tutoría - ${servicio_nombre}`
                     },
                     {
-                        ...templateParams,
-                        to_email: tutor_email,
-                        to_name: tutor_nombre,
-                        destinatario: 'tutor',
+                        ...baseTemplateParams,
+                        is_client: false,
+                        is_tutor: true,
+                        to_email: tutor_email, // for logging
                         asunto: `Reserva Cancelada - ${servicio_nombre}`
                     }
                 ];
